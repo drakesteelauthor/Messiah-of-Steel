@@ -1,0 +1,28 @@
+name: Rebuild Instagram image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'social/instagram/upload/READY'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild JPEG from base64 chunks
+        run: |
+          cat social/instagram/upload/derek.part* > /tmp/derek.b64
+          base64 -d /tmp/derek.b64 > social/instagram/2026-09-26_character-derek_system-progression.jpg
+          rm -rf social/instagram/upload
+      - name: Commit rebuilt image
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add social/instagram/2026-09-26_character-derek_system-progression.jpg social/instagram/upload
+          git commit -m 'Rebuild Derek Instagram visual from base64 chunks'
+          git push
